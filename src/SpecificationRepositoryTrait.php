@@ -15,7 +15,7 @@ trait SpecificationRepositoryTrait
     /**
      * @var string
      */
-    protected $dqlAlias = 'e';
+    protected $dqlAlias;
 
     /**
      * @see SpecificationAwareInterface::match()
@@ -36,7 +36,7 @@ trait SpecificationRepositoryTrait
             ));
         }
 
-        $queryBuilder = $this->createQueryBuilder($this->dqlAlias);
+        $queryBuilder = $this->createQueryBuilder($this->getDqlAlias());
         $this->modifyQueryBuilder($queryBuilder, $specification);
 
         return $this->modifyQuery($queryBuilder, $modifier);
@@ -53,7 +53,7 @@ trait SpecificationRepositoryTrait
      */
     private function modifyQueryBuilder(QueryBuilder $queryBuilder, SpecificationInterface $specification)
     {
-        $condition = $specification->modify($queryBuilder, $this->dqlAlias);
+        $condition = $specification->modify($queryBuilder, $this->getDqlAlias());
 
         if (empty($condition)) {
             return;
@@ -79,5 +79,19 @@ trait SpecificationRepositoryTrait
         }
 
         return $query;
+    }
+
+    /**
+     * Get DQL entity alias.
+     *
+     * @return string
+     */
+    protected function getDqlAlias()
+    {
+        if ($this->dqlAlias === null) {
+            $this->dqlAlias = strtoupper($this->getEntityName()[0]);
+        }
+
+        return $this->dqlAlias;
     }
 }
